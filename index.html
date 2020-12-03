@@ -21,8 +21,18 @@
     <script type="module">
       import * as THREE from 'https://unpkg.com/three/build/three.module.js'
 
-      function buildRibbon ({ width, radius, shiftMultiplier, thickness, segments, segmentSteps, textureUrl }) {
-        const geom = new THREE.BoxGeometry(segments * Math.PI * 2, width, thickness, segments * segmentSteps, 1, 1)
+      /**
+       * @param {number} height высота
+       * @param {number} radius радиус
+       * @param {number} thickness толщина
+       * @param shiftMultiplier
+       * @param {number} turnovers количество оборотов
+       * @param {number} turnoverSteps количество сегментов за 1 оборот
+       * @param {string} textureUrl url текстуры
+       * @return {THREE.Mesh}
+       */
+      function buildRibbon ({ height, radius, thickness, shiftMultiplier, turnovers, turnoverSteps, textureUrl }) {
+        const geom = new THREE.BoxGeometry(turnovers * Math.PI * 2, height, thickness, turnovers * turnoverSteps, 1, 1)
         geom.computeBoundingBox()
 
         // const size = new THREE.Vector3();
@@ -32,10 +42,10 @@
         geom.vertices.forEach(v => {
           const angle = -v.x
           const r = radius + v.z
-          const shift = (v.x / (Math.PI * 2)) * shiftMultiplier + v.y
+          const shift = (-angle / (Math.PI * 2)) * shiftMultiplier
 
           v.x = Math.cos(angle) * r
-          v.y = shift
+          v.y = v.y + shift
           v.z = Math.sin(angle) * r
         })
 
@@ -66,15 +76,15 @@
       }
 
       (function (container, { width, height }) {
-        const COLOR_SPOTLIGHT = 0x3d1e02
+        const COLOR_SPOTLIGHT = 0xFFFFFF
 
         const COLOR_AMBIENT_LIGHT = 0x404040
 
-        const INTENSITY_AMBIENT = 2
-        const INTENSITY_SPOTLIGHT = 3
+        const INTENSITY_AMBIENT = 3
+        const INTENSITY_SPOTLIGHT = 0.61
 
         const POSITION_CAMERA = [0, 0, 7]
-        const POSITION_SPOTLIGHT = [0, 1, 1]
+        const POSITION_SPOTLIGHT = [3.2, -1.8, 3]
         const POSITION_SPOTLIGHT_TARGET = [0, 0, 0]
 
         const renderer = new THREE.WebGLRenderer({
@@ -96,19 +106,19 @@
         scene.add(spotLight)
         scene.add(spotLight.target)
 
-        const spotLightHelper = new THREE.SpotLightHelper(spotLight, 0xFF0000)
-        scene.add(spotLightHelper)
+        // const spotLightHelper = new THREE.SpotLightHelper(spotLight, 0xFF0000)
+        // scene.add(spotLightHelper)
 
         const ambientLight = new THREE.AmbientLight(COLOR_AMBIENT_LIGHT, INTENSITY_AMBIENT)
         scene.add(ambientLight)
 
         const ribbon = buildRibbon({
-          width: 1.55,
+          turnovers: 3,
+          turnoverSteps: 30,
           radius: 1.7,
+          height: 1.3,
           shiftMultiplier: 3,
           thickness: 0.021,
-          segments: 3,
-          segmentSteps: 80,
           textureUrl: './assets/photos.png'
         })
         ribbon.position.set(0, 0, 0)
@@ -119,7 +129,7 @@
         function render () {
           requestAnimationFrame(render)
           ribbon.rotation.y -= 0.018
-          ribbon.rotation.x -= 0.018
+          // ribbon.rotation.x -= 0.018
           renderer.render(scene, camera)
         }
       })(
