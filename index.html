@@ -141,7 +141,12 @@
         }
 
         return {
-          // todo: listener
+          // todo: listener for angle
+          resize (width, height) {
+            camera.aspect = width / height
+            camera.updateProjectionMatrix()
+            renderer.setSize(width, height)
+          },
           setRotation (angle) {
             ribbon.rotation.y = angle
           }
@@ -155,9 +160,10 @@
       interactor.setRotation(1)
 
       // interaction
-      // window.addEventListener('scroll', function () {
-      //   console.log(pageXOffset)
-      // })
+      window.addEventListener('resize', function () {
+        // todo: throttle
+        interactor.resize(window.innerWidth, window.innerHeight)
+      })
       document.getElementById('rotation-input').addEventListener('input', function (event) {
         const angle = event.target.value
         interactor.setRotation(angle * Math.PI / 360)
