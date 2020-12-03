@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>webgl helix ribbon example</title>
+
+    <style>
+        body {
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+            background: url("./assets/bg.png");
+        }
+
+        #canvas {
+            /*position: absolute;*/
+            /*width: 100vw;*/
+            /*height: 100vh;*/
+        }
+    </style>
+    <script type="module">
+      import * as THREE from 'https://unpkg.com/three/build/three.module.js'
+
+      function buildRibbon ({ width, radius, shiftMultiplier, thickness, segments, segmentSteps, textureUrl }) {
+        const geom = new THREE.BoxGeometry(segments * Math.PI * 2, width, thickness, segments * segmentSteps, 1, 1)
+        geom.computeBoundingBox()
+
+        // const size = new THREE.Vector3();
+        // geom.boundingBox.getSize(size);
+        // geom.translate(size.x * 0.5, size.y * 0.5, size.z * 0.7);
+
+        geom.vertices.forEach(v => {
+          const angle = -v.x
+          const r = radius + v.z
+          const shift = (v.x / (Math.PI * 2)) * shiftMultiplier + v.y
+
+          v.x = Math.cos(angle) * r
+          v.y = shift
+          v.z = Math.sin(angle) * r
+        })
+
+        geom.computeFaceNormals()
+        geom.computeVertexNormals()
+        geom.center()
+
+        const textureLoader = new THREE.TextureLoader()
+
+        const texture = textureLoader.load(textureUrl)
+        texture.repeat.set(1, 1)
+
+        // transparency
+        // const alphaMapTexture = loader.load('./assets/negatives.png')
+        // alphaMapTexture.repeat.set(1, 1);
+        // alphaMap: alphaMapTexture,
+
+        const ribbonMaterial = new THREE.MeshLambertMaterial({
+          map: texture,
+          alphaTest: 0.1,
+          // transparent: true,
+        })
+
+        return new THREE.Mesh(geom, ribbonMaterial)
+        // ribbon.rotation.x = 0
+        // ribbon.rotation.y = 0
+        // ribbon.rotation.z = 0
+      }
+
+      (function (container, { width, height }) {
+        const COLOR_SPOTLIGHT = 0x3d1e02
+
+        const COLOR_AMBIENT_LIGHT = 0x404040
+
+        const INTENSITY_AMBIENT = 2
+        const INTENSITY_SPOTLIGHT = 3
+
+        const POSITION_CAMERA = [0, 0, 7]
+        const POSITION_SPOTLIGHT = [0, 1, 1]
+        const POSITION_SPOTLIGHT_TARGET = [0, 0, 0]
+
+        const renderer = new THREE.WebGLRenderer({
+          alpha: true,
+          antialias: true,
+        })
+        renderer.setSize(width, height)
+        // renderer.setClearColor(0xFF0000, 0);
+        container.appendChild(renderer.domElement)
+
+        const camera = new THREE.PerspectiveCamera(50, width / height, 1, 1000)
+        camera.position.set(...POSITION_CAMERA)
+
+        const scene = new THREE.Scene()
+
+        const spotLight = new THREE.SpotLight(COLOR_SPOTLIGHT, INTENSITY_SPOTLIGHT)
+        spotLight.position.set(...POSITION_SPOTLIGHT)
+        spotLight.target.position.set(...POSITION_SPOTLIGHT_TARGET)
+        scene.add(spotLight)
+        scene.add(spotLight.target)
+
+        const spotLightHelper = new THREE.SpotLightHelper(spotLight, 0xFF0000)
+        scene.add(spotLightHelper)
+
+        const ambientLight = new THREE.AmbientLight(COLOR_AMBIENT_LIGHT, INTENSITY_AMBIENT)
+        scene.add(ambientLight)
+
+        const ribbon = buildRibbon({
+          width: 1.55,
+          radius: 1.7,
+          shiftMultiplier: 3,
+          thickness: 0.021,
+          segments: 3,
+          segmentSteps: 80,
+          textureUrl: './assets/photos.png'
+        })
+        ribbon.position.set(0, 0, 0)
+        scene.add(ribbon)
+
+        render()
+
+        function render () {
+          requestAnimationFrame(render)
+          ribbon.rotation.y -= 0.018
+          ribbon.rotation.x -= 0.018
+          renderer.render(scene, camera)
+        }
+      })(
+        document.getElementById('container'),
+        {
+          width: window.innerWidth,
+          height: window.innerHeight
+        })
+    </script>
+</head>
+<body>
+<div id="container"></div>
+</body>
+</html>
