@@ -12,6 +12,13 @@
             background: url("./assets/bg.png");
         }
 
+        #rotation-input {
+            position: absolute;
+            left: 10px;
+            bottom: 10px;
+            width: 300px;
+        }
+
         #canvas {
             /*position: absolute;*/
             /*width: 100vw;*/
@@ -75,7 +82,7 @@
         // ribbon.rotation.z = 0
       }
 
-      (function (container, { width, height }) {
+      const interactor = (function (container, { width, height, autoRotate }) {
         const COLOR_SPOTLIGHT = 0xFFFFFF
 
         const COLOR_AMBIENT_LIGHT = 0x404040
@@ -121,26 +128,46 @@
           thickness: 0.021,
           textureUrl: './assets/photos.png'
         })
-        ribbon.position.set(0, 0, 0)
+        // ribbon.position.set(0, 0, 0)
         scene.add(ribbon)
 
         render()
 
         function render () {
           requestAnimationFrame(render)
-          ribbon.rotation.y -= 0.018
+          ribbon.rotation.y -= autoRotate
           // ribbon.rotation.x -= 0.018
           renderer.render(scene, camera)
         }
-      })(
-        document.getElementById('container'),
-        {
-          width: window.innerWidth,
-          height: window.innerHeight
-        })
+
+        return {
+          // todo: listener
+          setRotation (angle) {
+            ribbon.rotation.y = angle
+          }
+        }
+      })(document.getElementById('container'), {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        autoRotate: 0.005
+      })
+
+      interactor.setRotation(1)
+
+      // interaction
+      // window.addEventListener('scroll', function () {
+      //   console.log(pageXOffset)
+      // })
+      document.getElementById('rotation-input').addEventListener('input', function (event) {
+        const angle = event.target.value
+        interactor.setRotation(angle * Math.PI / 360)
+      })
     </script>
 </head>
 <body>
+
+<input id="rotation-input" type="range" min="0" max="360" step="1" style="width: 300px"/>
+
 <div id="container"></div>
 </body>
 </html>
