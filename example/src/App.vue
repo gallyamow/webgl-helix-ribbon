@@ -1,16 +1,22 @@
 <template>
   <div id="app">
-    <HelloWorld textureUrl="/photos.png"/>
+    <HelloWorld :textureUrl="texture"/>
   </div>
 </template>
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
+import Photos from './assets/photos.png'
 
 export default {
   name: 'App',
   components: {
     HelloWorld
+  },
+  data () {
+    return {
+      texture: Photos
+    }
   }
 }
 </script>
