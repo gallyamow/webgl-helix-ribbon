@@ -1,13 +1,13 @@
-import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import pkg from './package.json';
+import resolve from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
+import pkg from './package.json'
 
 export default [
 	// browser-friendly UMD build
 	{
 		input: 'src/main.js',
 		output: {
-			name: 'howLongUntilLunch',
+			name: 'webglHelixRibbon',
 			file: pkg.browser,
 			format: 'umd'
 		},
@@ -31,4 +31,4 @@ export default [
 			{ file: pkg.module, format: 'es' }
 		]
 	}
-];
+]
