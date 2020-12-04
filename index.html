@@ -82,7 +82,7 @@
         // ribbon.rotation.z = 0
       }
 
-      const interactor = (function (container, { width, height, autoRotate }) {
+      const interactor = (function (container, { width, height }) {
         const COLOR_SPOTLIGHT = 0xFFFFFF
 
         const COLOR_AMBIENT_LIGHT = 0x404040
@@ -93,6 +93,8 @@
         const POSITION_CAMERA = [0, 0, 7]
         const POSITION_SPOTLIGHT = [3.2, -1.8, 3]
         const POSITION_SPOTLIGHT_TARGET = [0, 0, 0]
+
+        let rotationSpeed = 0
 
         const renderer = new THREE.WebGLRenderer({
           alpha: true,
@@ -135,8 +137,10 @@
 
         function render () {
           requestAnimationFrame(render)
-          ribbon.rotation.y -= autoRotate
+
+          ribbon.rotation.y -= rotationSpeed
           // ribbon.rotation.x -= 0.018
+
           renderer.render(scene, camera)
         }
 
@@ -147,17 +151,24 @@
             camera.updateProjectionMatrix()
             renderer.setSize(width, height)
           },
-          setRotation (angle) {
+          setRotationSpeed (speed) {
+            rotationSpeed = speed
+          },
+          setRotationAngle (angle) {
             ribbon.rotation.y = angle
+          },
+          addRotationDelta (delta) {
+            ribbon.rotation.y += delta
           }
         }
       })(document.getElementById('container'), {
         width: window.innerWidth,
-        height: window.innerHeight,
-        autoRotate: 0.005
+        height: window.innerHeight
       })
 
-      interactor.setRotation(1)
+      const ROTATION_SPEED = 0.005
+
+      interactor.setRotationSpeed(ROTATION_SPEED)
 
       // interaction
       window.addEventListener('resize', function () {
@@ -166,7 +177,12 @@
       })
       document.getElementById('rotation-input').addEventListener('input', function (event) {
         const angle = event.target.value
-        interactor.setRotation(angle * Math.PI / 360)
+        interactor.setRotationSpeed(0)
+        interactor.setRotationAngle(angle * Math.PI / 360)
+        interactor.setRotationSpeed(ROTATION_SPEED)
+      })
+      window.addEventListener('wheel', function (event) {
+        interactor.addRotationDelta(event.deltaY * Math.PI / 360)
       })
     </script>
 </head>
