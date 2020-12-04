@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import renderHelixRibbon from 'webgl-helix-ribbon'
+import HelixRibbon from 'webgl-helix-ribbon'
 
 export default {
   name: 'HelloWorld',
@@ -14,7 +14,7 @@ export default {
   },
 
   created () {
-    this.ribbonInteractor = renderHelixRibbon(this.$refs.container, window.innerWidth, window.innerHeight, {
+    this.helixRibbon = new HelixRibbon(this.$refs.container, window.innerWidth, window.innerHeight, {
       height: 1.3,
       radius: 1.7,
       thickness: 0.021,
@@ -23,10 +23,20 @@ export default {
       shiftMultiplier: 3,
       textureUrl: this.texture
     })
+
+    window.addEventListener('resize', this.onWindowResize)
   },
 
   destroyed () {
-    this.ribbonInteractor.destroy()
+    this.helixRibbon.destroy()
+
+    window.removeEventListener('resize', this.onWindowResize)
+  },
+
+  methods: {
+    onWindowResize () {
+      this.helixRibbon.resize(window.innerWidth, window.innerHeight)
+    }
   }
 }
 </script>
