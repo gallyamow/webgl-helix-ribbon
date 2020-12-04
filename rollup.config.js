@@ -13,9 +13,12 @@ export default [
       format: 'umd'
     },
     plugins: [
-      babel({ babelHelpers: 'bundled' }),
-      resolve(), // so Rollup can find `ms`
-      commonjs() // so Rollup can convert `ms` to an ES module
+      resolve(),
+      commonjs(),
+      babel({
+        babelHelpers: 'bundled',
+        exclude: ['node_modules/**']
+      }),
     ]
   },
 
@@ -27,10 +30,16 @@ export default [
   // `file` and `format` for each target)
   {
     input: 'src/index.js',
-    external: ['ms'],
     output: [
       { file: pkg.main, format: 'cjs' },
       { file: pkg.module, format: 'es' }
+    ],
+    // @see https://github.com/rollup/rollup-starter-lib/blob/babel/rollup.config.js
+    plugins: [
+      babel({
+        babelHelpers: 'bundled',
+        exclude: ['node_modules/**']
+      }),
     ]
   }
 ]

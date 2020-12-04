@@ -30,7 +30,7 @@ export function buildRenderer () {
   })
 }
 
-export function buildCamera () {
+export function buildCamera (width, height) {
   const camera = new PerspectiveCamera(50, width / height, 1, 1000)
   camera.position.set(...POSITION_CAMERA)
 

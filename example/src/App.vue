@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <HelloWorld texture="./assets/photos.png"/>
+    <HelloWorld textureUrl="/photos.png"/>
   </div>
 </template>
 
@@ -18,6 +18,7 @@ export default {
 <style>
   body {
     background: black;
+    overflow: hidden;
     padding: 0;
     margin: 0;
   }
