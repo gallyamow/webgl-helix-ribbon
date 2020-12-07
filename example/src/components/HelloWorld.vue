@@ -35,6 +35,8 @@ export default {
     // noinspection JSCheckFunctionSignatures
     this.helixRibbonScene.render(this.$refs.container)
 
+    this.helixRibbonScene.getEventsTarget().addEventListener('click', this.onPhotoClick)
+
     window.addEventListener('resize', this.onWindowResize)
     window.addEventListener('wheel', this.onWheel)
   },
@@ -47,9 +49,14 @@ export default {
   },
 
   methods: {
+    onPhotoClick (e) {
+      this.$emit('photoClick', { index: e.detail.segment })
+    },
+
     onWindowResize () {
       this.helixRibbonScene.resize(window.innerWidth, window.innerHeight)
     },
+
     onWheel (event) {
       this.helixRibbonScene.addRotationDelta((event.deltaY / 3) * Math.PI / 360)
     }

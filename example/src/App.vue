@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <HelloWorld :photos="photos"/>
+    <HelloWorld :photos="photos" @photoClick="onPhotoClick"/>
   </div>
 </template>
 
@@ -9,18 +9,26 @@ import HelloWorld from './components/HelloWorld.vue'
 
 export default {
   name: 'App',
+
   components: {
     HelloWorld
   },
+
   data () {
     const photos = []
 
     for (let i = 1; i <= 15; i++) {
-      photos.push({ photoUrl: require('./assets/photo-' + i + '.png'), width: 1 })
+      photos.push({ photoUrl: require('./assets/photo.png'), width: 1 })
     }
 
     return {
       photos
+    }
+  },
+
+  methods: {
+    onPhotoClick (e) {
+      alert(`Photo with index ${e.index} clicked`)
     }
   }
 }

@@ -10,8 +10,8 @@ import {
   SpotLight,
   SpotLightHelper,
   TextureLoader,
-  WebGLRenderer,
-  Vector3
+  Vector3,
+  WebGLRenderer
 } from 'three'
 
 const COLOR_SPOTLIGHT = 0xFFFFFF
@@ -22,7 +22,7 @@ const INTENSITY_AMBIENT = 3
 const INTENSITY_SPOTLIGHT = 0.61
 
 const POSITION_CAMERA = [0, 0, 7]
-const POSITION_SPOTLIGHT = [3.2, -1.8, 3]
+const POSITION_SPOTLIGHT = [2.2, -2.2, 2.2]
 const POSITION_SPOTLIGHT_TARGET = [0, 0, 0]
 
 export function buildRenderer () {
@@ -77,11 +77,13 @@ export function buildRibbon ({ photos, photoWidth, photoHeight, radius, thicknes
   const segmentsGeometries = buildRibbonSegmentsGeometry(turnovers, photos.length, radius, photoHeight, thickness, steps, shiftMultiplier)
 
   const objects = photos.map((photo, i) => {
-    return new Mesh(segmentsGeometries[i], new MeshLambertMaterial({
+    const obj = new Mesh(segmentsGeometries[i], new MeshLambertMaterial({
       map: loadTexture(photo.photoUrl),
       alphaTest: 0.1,
       // transparent: true,
     }))
+    obj.userData = { segment: i }
+    return obj
   })
 
   return (new Group()).add(...objects)
@@ -113,7 +115,6 @@ function buildRibbonSegmentsGeometry (turnovers, segmentsNumber, radius, segment
     // prefer BufferGeometry
     // const geom = new PlaneGeometry(width, segmentHeight, steps, 1)
     const geom = new BoxGeometry(segmentWidth, segmentHeight, segmentThickness, steps, 1, 1)
-
     geom.computeBoundingBox()
 
     geom.vertices.forEach(v => {
@@ -126,13 +127,18 @@ function buildRibbonSegmentsGeometry (turnovers, segmentsNumber, radius, segment
       v.z = Math.sin(a) * r
     })
 
-    angle += segmentWidth
+    geom.computeBoundingBox()
+    // geom.computeFaceNormals()
+    // geom.computeVertexNormals()
+    //geom.center()
 
     const size = new Vector3()
     geom.boundingBox.getSize(size)
-    geom.translate(size.x * 0.5, size.y * 3.1, size.z * 0.5)
+    geom.translate(0, size.y * 2.6, 0)
 
     segmentsGeometries.push(geom)
+
+    angle += segmentWidth
   }
 
   return segmentsGeometries
