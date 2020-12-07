@@ -1,12 +1,11 @@
 <template>
   <div id="app">
-    <HelloWorld :textureUrl="texture"/>
+    <HelloWorld :photos="photos"/>
   </div>
 </template>
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
-import Photos from './assets/photos.png'
 
 export default {
   name: 'App',
@@ -14,8 +13,14 @@ export default {
     HelloWorld
   },
   data () {
+    const photos = []
+
+    for (let i = 1; i <= 15; i++) {
+      photos.push({ photoUrl: require('./assets/photo-' + i + '.png'), width: 1 })
+    }
+
     return {
-      texture: Photos
+      photos
     }
   }
 }

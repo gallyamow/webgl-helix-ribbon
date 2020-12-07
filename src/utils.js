@@ -1,6 +1,8 @@
 import {
   AmbientLight,
+  AxesHelper,
   BoxGeometry,
+  Group,
   Mesh,
   MeshLambertMaterial,
   PerspectiveCamera,
@@ -8,7 +10,8 @@ import {
   SpotLight,
   SpotLightHelper,
   TextureLoader,
-  WebGLRenderer
+  WebGLRenderer,
+  Vector3
 } from 'three'
 
 const COLOR_SPOTLIGHT = 0xFFFFFF
@@ -52,9 +55,36 @@ export function buildScene (spotLightHelper = false) {
   if (spotLightHelper) {
     const spotLightHelper = new SpotLightHelper(spotLight, 0xFF0000)
     scene.add(spotLightHelper)
+
+    const axesHelper = new AxesHelper(5)
+    scene.add(axesHelper)
   }
 
   return scene
+}
+
+/**
+ * @param {PhotoSegment[]} photos
+ * @param {number} height
+ * @param {number} radius
+ * @param {number} thickness
+ * @param {number} turnovers
+ * @param {number} steps
+ * @param {number} shiftMultiplier
+ * @return {Group}
+ */
+export function buildRibbon ({ photos, photoWidth, photoHeight, radius, thickness, turnovers, steps, shiftMultiplier }) {
+  const segmentsGeometries = buildRibbonSegmentsGeometry(turnovers, photos.length, radius, photoHeight, thickness, steps, shiftMultiplier)
+
+  const objects = photos.map((photo, i) => {
+    return new Mesh(segmentsGeometries[i], new MeshLambertMaterial({
+      map: loadTexture(photo.photoUrl),
+      alphaTest: 0.1,
+      // transparent: true,
+    }))
+  })
+
+  return (new Group()).add(...objects)
 }
 
 function loadTexture (textureUrl) {
@@ -66,44 +96,50 @@ function loadTexture (textureUrl) {
   return texture
 }
 
-function buildRibbonGeometry (radius, height, thickness, turnovers, turnoverSteps, shiftMultiplier) {
-  const geom = new BoxGeometry(turnovers * Math.PI * 2, height, thickness, turnovers * turnoverSteps, 1, 1)
-  geom.computeBoundingBox()
+/**
+ * @private
+ */
+function buildRibbonSegmentsGeometry (turnovers, segmentsNumber, radius, segmentHeight, segmentThickness, steps, shiftMultiplier) {
+  const segmentWidth = turnovers * Math.PI * 2 / segmentsNumber
 
-  // const size = new THREE.Vector3();
-  // geom.boundingBox.getSize(size);
-  // geom.translate(size.x * 0.5, size.y * 0.5, size.z * 0.7);
+  /**
+   * @type {BoxGeometry[]}
+   */
+  const segmentsGeometries = []
 
-  geom.vertices.forEach(v => {
-    const angle = -v.x
-    const r = radius + v.z
-    const shift = (-angle / (Math.PI * 2)) * shiftMultiplier
+  let angle = 0
 
-    v.x = Math.cos(angle) * r
-    v.y = v.y + shift
-    v.z = Math.sin(angle) * r
-  })
+  for (let i = 0; i < segmentsNumber; i++) {
+    // prefer BufferGeometry
+    // const geom = new PlaneGeometry(width, segmentHeight, steps, 1)
+    const geom = new BoxGeometry(segmentWidth, segmentHeight, segmentThickness, steps, 1, 1)
 
-  geom.computeFaceNormals()
-  geom.computeVertexNormals()
-  geom.center()
+    geom.computeBoundingBox()
 
-  return geom
+    geom.vertices.forEach(v => {
+      const a = -v.x + angle
+      const r = radius + v.z
+      const shift = (-a / (Math.PI * 2)) * shiftMultiplier
+
+      v.x = Math.cos(a) * r
+      v.y = v.y + shift
+      v.z = Math.sin(a) * r
+    })
+
+    angle += segmentWidth
+
+    const size = new Vector3()
+    geom.boundingBox.getSize(size)
+    geom.translate(size.x * 0.5, size.y * 3.1, size.z * 0.5)
+
+    segmentsGeometries.push(geom)
+  }
+
+  return segmentsGeometries
 }
 
-export function buildRibbon ({ height, radius, thickness, turnovers, turnoverSteps, shiftMultiplier, textureUrl }) {
-  const geom = buildRibbonGeometry(radius, height, thickness, turnovers, turnoverSteps, shiftMultiplier)
-
-  // transparency
-  // const alphaMapTexture = loader.load('./assets/negatives.png')
-  // alphaMapTexture.repeat.set(1, 1);
-  // alphaMap: alphaMapTexture,
-
-  const ribbonMaterial = new MeshLambertMaterial({
-    map: loadTexture(textureUrl),
-    alphaTest: 0.1,
-    // transparent: true,
-  })
-
-  return new Mesh(geom, ribbonMaterial)
-}
+/**
+ * @typedef {Object} PhotoSegment
+ * @property {string} photoUrl - URL of texture
+ * @property {number} width - width in radians
+ */

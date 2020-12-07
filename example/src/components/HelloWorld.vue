@@ -1,7 +1,6 @@
 <template>
   <div class="hello">
     <div ref="container"></div>
-    >
   </div>
 </template>
 
@@ -11,7 +10,10 @@ import { HelixRibbonScene } from 'webgl-helix-ribbon'
 export default {
   name: 'HelloWorld',
   props: {
-    textureUrl: String
+    photos: {
+      type: Array,
+      required: true
+    }
   },
 
   mounted () {
@@ -19,16 +21,18 @@ export default {
      * @type {HelixRibbonScene}
      */
     this.helixRibbonScene = (new HelixRibbonScene(window.innerWidth, window.innerHeight, {
-      height: 1.3,
+      photos: this.photos,
+      photoWidth: 1.3,
+      photoHeight: 1.3,
       radius: 1.7,
       thickness: 0.021,
       turnovers: 3,
-      turnoverSteps: 30,
-      shiftMultiplier: 3,
-      textureUrl: this.textureUrl
+      steps: 30,
+      shiftMultiplier: 3
     })).prepare()
 
     this.helixRibbonScene.setRotationSpeed(0.005)
+    // noinspection JSCheckFunctionSignatures
     this.helixRibbonScene.render(this.$refs.container)
 
     window.addEventListener('resize', this.onWindowResize)

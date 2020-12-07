@@ -24,7 +24,7 @@ export default class HelixRibbonScene {
     this.renderer.setSize(this.sceneWidth, this.sceneHeight)
 
     this.camera = camera ?? buildCamera(this.sceneWidth, this.sceneHeight)
-    this.scene = scene ?? buildScene(false)
+    this.scene = scene ?? buildScene(true)
 
     this.ribbon = buildRibbon(this.ribbonOptions)
     this.scene.add(this.ribbon)
