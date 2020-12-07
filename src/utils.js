@@ -22,7 +22,7 @@ const INTENSITY_AMBIENT = 3
 const INTENSITY_SPOTLIGHT = 0.61
 
 const POSITION_CAMERA = [0, 0, 7]
-const POSITION_SPOTLIGHT = [2.2, -2.2, 2.2]
+const POSITION_SPOTLIGHT = [2.2, -2.2, 4]
 const POSITION_SPOTLIGHT_TARGET = [0, 0, 0]
 
 export function buildRenderer () {
@@ -134,7 +134,7 @@ function buildRibbonSegmentsGeometry (turnovers, segmentsNumber, radius, segment
 
     const size = new Vector3()
     geom.boundingBox.getSize(size)
-    geom.translate(0, size.y * 2.6, 0)
+    geom.translate(0, size.y * 2.2, 0)
 
     segmentsGeometries.push(geom)
 
