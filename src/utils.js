@@ -22,7 +22,7 @@ const INTENSITY_AMBIENT = 3
 const INTENSITY_SPOTLIGHT = 0.61
 
 const POSITION_CAMERA = [0, 0, 7]
-const POSITION_SPOTLIGHT = [2.2, -2.2, 4]
+const POSITION_SPOTLIGHT = [1, 1, 5]
 const POSITION_SPOTLIGHT_TARGET = [0, 0, 0]
 
 export function buildRenderer () {
@@ -40,7 +40,7 @@ export function buildCamera (width, height) {
   return camera
 }
 
-export function buildScene (spotLightHelper = false) {
+export function buildScene (useHelpers = false) {
   const scene = new Scene()
 
   const ambientLight = new AmbientLight(COLOR_AMBIENT_LIGHT, INTENSITY_AMBIENT)
@@ -52,7 +52,7 @@ export function buildScene (spotLightHelper = false) {
   scene.add(spotLight)
   scene.add(spotLight.target)
 
-  if (spotLightHelper) {
+  if (useHelpers) {
     const spotLightHelper = new SpotLightHelper(spotLight, 0xFF0000)
     scene.add(spotLightHelper)
 
@@ -73,7 +73,7 @@ export function buildScene (spotLightHelper = false) {
  * @param {number} shiftMultiplier
  * @return {Group}
  */
-export function buildRibbon ({ photos, photoWidth, photoHeight, radius, thickness, turnovers, steps, shiftMultiplier }) {
+export function buildRibbon ({ photos, photoHeight, radius, thickness, turnovers, steps, shiftMultiplier }) {
   const segmentsGeometries = buildRibbonSegmentsGeometry(turnovers, photos.length, radius, photoHeight, thickness, steps, shiftMultiplier)
 
   const objects = photos.map((photo, i) => {

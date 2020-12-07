@@ -22,9 +22,8 @@ export default {
      */
     this.helixRibbonScene = (new HelixRibbonScene(window.innerWidth, window.innerHeight, {
       photos: this.photos,
-      photoWidth: 1.3,
       photoHeight: 1.3,
-      radius: 1.7,
+      radius: 2,
       thickness: 0.021,
       turnovers: 3,
       steps: 30,
