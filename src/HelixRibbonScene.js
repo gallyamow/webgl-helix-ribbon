@@ -1,4 +1,4 @@
-import { buildCamera, buildRenderer, buildRibbon, buildScene } from './utils'
+import { buildCamera, buildRenderer, buildRibbon, buildScene, loadTexture } from './utils'
 import { Raycaster, Vector2 } from 'three'
 
 export default class HelixRibbonScene {
@@ -12,6 +12,7 @@ export default class HelixRibbonScene {
     this.sceneHeight = sceneHeight
     this.ribbonOptions = ribbonOptions
     this.rotationSpeed = 0
+    this.textures = []
     this.eventTarget = new EventTarget()
   }
 
@@ -28,8 +29,17 @@ export default class HelixRibbonScene {
     this.camera = camera ?? buildCamera(this.sceneWidth, this.sceneHeight)
     this.scene = scene ?? buildScene(false)
 
-    this.ribbon = buildRibbon(this.ribbonOptions)
-    this.scene.add(this.ribbon)
+    const { photos } = this.ribbonOptions
+
+    // async/ await
+    Promise.all(photos.map(v => loadTexture(v.photoUrl))).then(textures => {
+      this.textures = textures
+
+      this.ribbon = buildRibbon(this.textures, this.ribbonOptions)
+      this.scene.add(this.ribbon)
+
+      this.eventTarget.dispatchEvent(new CustomEvent('ready'))
+    })
 
     this.raycaster = new Raycaster()
     this.mouse = new Vector2()
@@ -49,8 +59,11 @@ export default class HelixRibbonScene {
     const renderFrame = () => {
       requestAnimationFrame(renderFrame)
 
-      this.ribbon.rotation.y -= this.rotationSpeed
-      this.renderer.render(this.scene, this.camera)
+      // waiting is ready
+      if (this.ribbon) {
+        this.ribbon.rotation.y -= this.rotationSpeed
+        this.renderer.render(this.scene, this.camera)
+      }
     }
 
     renderFrame()

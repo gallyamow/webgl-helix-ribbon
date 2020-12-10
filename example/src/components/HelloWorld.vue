@@ -1,14 +1,19 @@
 <template>
   <div class="hello">
-    <div ref="container"></div>
+    <Preloader
+      v-if="loading"
+      style="position:absolute;  left: 50%; top: 50%; transform: translate(-50%, -50%);"
+    />
+    <div ref="container" v-show="!loading"></div>
   </div>
 </template>
 
 <script>
 import { HelixRibbonScene } from 'webgl-helix-ribbon'
+import Preloader from './Preloader.vue'
 
 export default {
-  name: 'HelloWorld',
+  components: { Preloader },
   props: {
     photos: {
       type: Array,
@@ -16,7 +21,13 @@ export default {
     }
   },
 
-  mounted () {
+  data () {
+    return {
+      loading: true
+    }
+  },
+
+  created () {
     /**
      * @type {HelixRibbonScene}
      */
@@ -31,10 +42,15 @@ export default {
     })).prepare()
 
     this.helixRibbonScene.setRotationSpeed(0.005)
+  },
+
+  mounted () {
     // noinspection JSCheckFunctionSignatures
     this.helixRibbonScene.render(this.$refs.container)
 
-    this.helixRibbonScene.getEventsTarget().addEventListener('click', this.onPhotoClick)
+    const eventTarget = this.helixRibbonScene.getEventsTarget()
+    eventTarget.addEventListener('click', this.onPhotoClick)
+    eventTarget.addEventListener('ready', this.onReady)
 
     window.addEventListener('resize', this.onWindowResize)
     window.addEventListener('wheel', this.onWheel)
@@ -48,6 +64,10 @@ export default {
   },
 
   methods: {
+    onReady () {
+      this.loading = false
+    },
+
     onPhotoClick (e) {
       this.$emit('photoClick', { index: e.detail.segment })
     },

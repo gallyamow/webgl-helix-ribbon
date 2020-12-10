@@ -64,7 +64,7 @@ export function buildScene (useHelpers = false) {
 }
 
 /**
- * @param {PhotoSegment[]} photos
+ * @param {Texture[]} textures
  * @param {number} height
  * @param {number} radius
  * @param {number} thickness
@@ -73,15 +73,17 @@ export function buildScene (useHelpers = false) {
  * @param {number} shiftMultiplier
  * @return {Group}
  */
-export function buildRibbon ({ photos, photoHeight, radius, thickness, turnovers, steps, shiftMultiplier }) {
-  const segmentsGeometries = buildRibbonSegmentsGeometry(turnovers, photos.length, radius, photoHeight, thickness, steps, shiftMultiplier)
+export function buildRibbon (textures, { photoHeight, radius, thickness, turnovers, steps, shiftMultiplier }) {
+  const segmentsGeometries = buildRibbonSegmentsGeometry(turnovers, textures.length, radius, photoHeight, thickness, steps, shiftMultiplier)
 
-  const objects = photos.map((photo, i) => {
-    const obj = new Mesh(segmentsGeometries[i], new MeshLambertMaterial({
-      map: loadTexture(photo.photoUrl),
+  const objects = textures.map((texture, i) => {
+    const material = new MeshLambertMaterial({
+      map: texture,
       alphaTest: 0.1,
       // transparent: true,
-    }))
+    })
+
+    const obj = new Mesh(segmentsGeometries[i], material)
     obj.userData = { segment: i }
     return obj
   })
@@ -89,13 +91,15 @@ export function buildRibbon ({ photos, photoHeight, radius, thickness, turnovers
   return (new Group()).add(...objects)
 }
 
-function loadTexture (textureUrl) {
+export function loadTexture (textureUrl) {
   const textureLoader = new TextureLoader()
 
-  const texture = textureLoader.load(textureUrl)
-  texture.repeat.set(1, 1)
-
-  return texture
+  return new Promise((resolve) => {
+    textureLoader.load(textureUrl, (texture) => {
+      texture.repeat.set(1, 1)
+      resolve(texture)
+    })
+  })
 }
 
 /**
