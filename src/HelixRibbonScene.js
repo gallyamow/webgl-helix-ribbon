@@ -124,6 +124,10 @@ export default class HelixRibbonScene {
     this.raycaster.setFromCamera(this.mouse, this.camera)
     const intersects = this.raycaster.intersectObjects(this.scene.children, true)
 
+    if (!intersects.length) {
+      return
+    }
+
     const firstIntersection = intersects[0] ?? null
     const segment = firstIntersection?.object?.userData?.segment
     if (segment) {

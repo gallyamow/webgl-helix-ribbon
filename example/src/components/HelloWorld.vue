@@ -38,7 +38,9 @@ export default {
       thickness: 0.021,
       turnovers: 3,
       steps: 30,
-      shiftMultiplier: 3
+      shiftMultiplier: 3,
+      // y - для регулировки смещения по вертикали
+      translateMultiplier: { x: 0, y: 1.2, z: 0 }
     })).prepare()
 
     this.helixRibbonScene.setRotationSpeed(0.005)

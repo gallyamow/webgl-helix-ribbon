@@ -73,8 +73,17 @@ export function buildScene (useHelpers = false) {
  * @param {number} shiftMultiplier
  * @return {Group}
  */
-export function buildRibbon (textures, { photoHeight, radius, thickness, turnovers, steps, shiftMultiplier }) {
-  const segmentsGeometries = buildRibbonSegmentsGeometry(turnovers, textures.length, radius, photoHeight, thickness, steps, shiftMultiplier)
+export function buildRibbon (textures, {
+    photoHeight,
+    radius,
+    thickness,
+    turnovers,
+    steps,
+    shiftMultiplier,
+    translateMultiplier = { x: 0, y: 0, z: 0 }
+  }
+) {
+  const segmentsGeometries = buildRibbonSegmentsGeometry(turnovers, textures.length, radius, photoHeight, thickness, steps, shiftMultiplier, translateMultiplier)
 
   const objects = textures.map((texture, i) => {
     const material = new MeshLambertMaterial({
@@ -105,7 +114,7 @@ export function loadTexture (textureUrl) {
 /**
  * @private
  */
-function buildRibbonSegmentsGeometry (turnovers, segmentsNumber, radius, segmentHeight, segmentThickness, steps, shiftMultiplier) {
+function buildRibbonSegmentsGeometry (turnovers, segmentsNumber, radius, segmentHeight, segmentThickness, steps, shiftMultiplier, translateMultiplier) {
   const segmentWidth = turnovers * Math.PI * 2 / segmentsNumber
 
   /**
@@ -138,7 +147,7 @@ function buildRibbonSegmentsGeometry (turnovers, segmentsNumber, radius, segment
 
     const size = new Vector3()
     geom.boundingBox.getSize(size)
-    geom.translate(0, size.y * 2.2, 0)
+    geom.translate(translateMultiplier.x * size.x, translateMultiplier.y * size.y, translateMultiplier.z * size.z)
 
     segmentsGeometries.push(geom)
 

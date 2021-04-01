@@ -17,8 +17,14 @@ export default {
   data () {
     const photos = []
 
-    for (let i = 1; i <= 15; i++) {
-      photos.push({ photoUrl: require('./assets/photo-' + (i % 5) + '.png'), width: 1 })
+    let k = 0, maxK = 4
+    for (let i = 1; i <= 5; i++) {
+      photos.push({ photoUrl: require('./assets/test-photo-' + k + '.png'), width: 1 })
+
+      k++
+      if (k > maxK) {
+        k = 0
+      }
     }
 
     return {
