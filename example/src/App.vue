@@ -7,8 +7,8 @@
 <script>
 import HelloWorld from './components/HelloWorld.vue'
 
-const USE_TEST_PHOTOS = true
-const SEGMENTS_COUNT = 5
+const USE_TEST_PHOTOS = false
+const SEGMENTS_COUNT = 25
 
 export default {
   name: 'App',
