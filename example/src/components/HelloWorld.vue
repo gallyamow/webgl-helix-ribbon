@@ -16,6 +16,8 @@
 <script>
 const CONTAINER_WIDTH = 600
 const CONTAINER_HEIGHT = 800
+const DEFAULT_ROTATION_SPEED = 0.005
+const SLOW_ROTATION_SPEED = 0.0005
 
 import { HelixRibbonScene } from 'webgl-helix-ribbon'
 import Preloader from './Preloader.vue'
@@ -51,7 +53,7 @@ export default {
       translateMultiplier: { x: 0, y: 2.5, z: 0 }
     })).prepare()
 
-    this.helixRibbonScene.setRotationSpeed(0.005)
+    this.helixRibbonScene.setRotationSpeed(DEFAULT_ROTATION_SPEED)
   },
 
   mounted () {
@@ -100,11 +102,11 @@ export default {
     },
 
     onMouseEnter () {
-      this.helixRibbonScene.setRotationEnabled(false)
+      this.helixRibbonScene.setRotationSpeed(SLOW_ROTATION_SPEED)
     },
 
     onMouseLeave () {
-      this.helixRibbonScene.setRotationEnabled(true)
+      this.helixRibbonScene.setRotationSpeed(DEFAULT_ROTATION_SPEED)
     }
   }
 }
