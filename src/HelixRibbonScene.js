@@ -12,6 +12,7 @@ export default class HelixRibbonScene {
     this.sceneHeight = sceneHeight
     this.ribbonOptions = ribbonOptions
     this.rotationSpeed = 0
+    this.rotationEnabled = true
     this.textures = []
     this.eventTarget = new EventTarget()
   }
@@ -61,7 +62,10 @@ export default class HelixRibbonScene {
 
       // waiting is ready
       if (this.ribbon) {
-        this.ribbon.rotation.y -= this.rotationSpeed
+        if (this.rotationEnabled) {
+          this.ribbon.rotation.y -= this.rotationSpeed
+        }
+
         this.renderer.render(this.scene, this.camera)
       }
     }
@@ -81,6 +85,11 @@ export default class HelixRibbonScene {
     this.camera.updateProjectionMatrix()
     this.renderer.setSize(width, height)
 
+    return this
+  }
+
+  setRotationEnabled (enabled) {
+    this.rotationEnabled = enabled
     return this
   }
 
@@ -118,26 +127,34 @@ export default class HelixRibbonScene {
   onMouseClick (event) {
     event.preventDefault()
 
-    this.mouse.x = (event.clientX / this.sceneWidth) * 2 - 1
-    this.mouse.y = -(event.clientY / this.sceneHeight) * 2 + 1
+    const rect = this.renderer.domElement.getBoundingClientRect()
+
+    this.mouse.x = ((event.clientX - rect.left) / this.sceneWidth) * 2 - 1
+    this.mouse.y = -((event.clientY - rect.top) / this.sceneHeight) * 2 + 1
+
+    // console.log(rect, this.mouse, event)
 
     this.raycaster.setFromCamera(this.mouse, this.camera)
     const intersects = this.raycaster.intersectObjects(this.scene.children, true)
 
-    if (!intersects.length) {
+    if (intersects.length === 0) {
       return
     }
 
     const firstIntersection = intersects[0] ?? null
     const segment = firstIntersection?.object?.userData?.segment
-    if (segment) {
-      // firstIntersection.object.material.color.set(0xff0000)
-      this.eventTarget.dispatchEvent(new CustomEvent('click', { detail: { segment: segment } }))
+
+    // strict check
+    if (segment === undefined) {
+      return
     }
+
+    // firstIntersection.object.material.color.set(0xff0000)
+    this.eventTarget.dispatchEvent(new CustomEvent('click', { detail: { segment: segment } }))
   }
 
   destroy () {
-    this.renderer.domElement.removeEventListener('mousemove', this.onMouseClick.bind(this), false)
+    this.renderer.domElement.removeEventListener('click', this.onMouseClick.bind(this), false)
 
     // @see https://discourse.threejs.org/t/how-to-completely-clean-up-a-three-js-scene-from-a-web-app-once-the-scene-is-no-longer-needed/1549/4
     this.renderer.dispose()

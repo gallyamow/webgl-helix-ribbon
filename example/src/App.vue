@@ -7,6 +7,9 @@
 <script>
 import HelloWorld from './components/HelloWorld.vue'
 
+const USE_TEST_PHOTOS = true
+const SEGMENTS_COUNT = 5
+
 export default {
   name: 'App',
 
@@ -16,13 +19,13 @@ export default {
 
   data () {
     const photos = []
+    const fileName = USE_TEST_PHOTOS ? 'test-photo' : 'photo'
 
-    let k = 0, maxK = 4
-    for (let i = 1; i <= 5; i++) {
-      photos.push({ photoUrl: require('./assets/test-photo-' + k + '.png'), width: 1 })
+    let k = 0, photosCount = 4
+    for (let i = 1; i <= SEGMENTS_COUNT; i++) {
+      photos.push({ photoUrl: require('./assets/' + fileName + '-' + (k++) + '.png'), width: 1 })
 
-      k++
-      if (k > maxK) {
+      if (k > photosCount) {
         k = 0
       }
     }
@@ -34,7 +37,7 @@ export default {
 
   methods: {
     onPhotoClick (e) {
-      alert(`Photo with index ${e.index} clicked`)
+      console.log(`Photo with index ${e.index} clicked`)
     }
   }
 }

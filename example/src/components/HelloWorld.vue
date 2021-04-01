@@ -2,13 +2,21 @@
   <div class="hello">
     <Preloader
       v-if="loading"
-      style="position:absolute;  left: 50%; top: 50%; transform: translate(-50%, -50%);"
+      class="centered"
     />
-    <div ref="container" v-show="!loading"></div>
+    <div
+      ref="container"
+      v-show="!loading"
+      class="container centered"
+    >
+    </div>
   </div>
 </template>
 
 <script>
+const CONTAINER_WIDTH = 600
+const CONTAINER_HEIGHT = 800
+
 import { HelixRibbonScene } from 'webgl-helix-ribbon'
 import Preloader from './Preloader.vue'
 
@@ -31,7 +39,7 @@ export default {
     /**
      * @type {HelixRibbonScene}
      */
-    this.helixRibbonScene = (new HelixRibbonScene(window.innerWidth, window.innerHeight, {
+    this.helixRibbonScene = (new HelixRibbonScene(CONTAINER_WIDTH, CONTAINER_HEIGHT, {
       photos: this.photos,
       photoHeight: 1.3,
       radius: 2,
@@ -56,6 +64,14 @@ export default {
 
     window.addEventListener('resize', this.onWindowResize)
     window.addEventListener('wheel', this.onWheel)
+
+    this.$refs.container.addEventListener('mouseenter', this.onMouseEnter, false)
+    this.$refs.container.addEventListener('mouseleave', this.onMouseLeave, false)
+  },
+
+  beforeDestroy () {
+    this.$refs.container.removeEventListener('mouseenter', this.onMouseEnter, false)
+    this.$refs.container.removeEventListener('mouseleave', this.onMouseLeave, false)
   },
 
   destroyed () {
@@ -75,18 +91,35 @@ export default {
     },
 
     onWindowResize () {
-      this.helixRibbonScene.resize(window.innerWidth, window.innerHeight)
+      // disabled because we use exact sizes
+      // this.helixRibbonScene.resize(window.innerWidth, window.innerHeight)
     },
 
     onWheel (event) {
       this.helixRibbonScene.addRotationDelta((event.deltaY / 3) * Math.PI / 360)
+    },
+
+    onMouseEnter () {
+      this.helixRibbonScene.setRotationEnabled(false)
+    },
+
+    onMouseLeave () {
+      this.helixRibbonScene.setRotationEnabled(true)
     }
   }
 }
 </script>
 
 <style scoped>
-  h3 {
-    margin: 40px 0 0;
+  .centered {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .container {
+    border: 1px solid #AAA;
+    width: 600px;
   }
 </style>
