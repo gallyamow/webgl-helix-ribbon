@@ -44,7 +44,7 @@ export default class HelixRibbonScene {
     this.raycaster = new Raycaster()
     this.mouse = new Vector2()
 
-    document.addEventListener('click', this.onDocumentMouseClick.bind(this), false)
+    this.renderer.domElement.addEventListener('click', this.onMouseClick.bind(this), false)
 
     return this
   }
@@ -115,7 +115,7 @@ export default class HelixRibbonScene {
     return this.eventTarget
   }
 
-  onDocumentMouseClick (event) {
+  onMouseClick (event) {
     event.preventDefault()
 
     this.mouse.x = (event.clientX / this.sceneWidth) * 2 - 1
@@ -133,7 +133,7 @@ export default class HelixRibbonScene {
   }
 
   destroy () {
-    document.removeEventListener('mousemove', this.onDocumentMouseClick.bind(this), false)
+    this.renderer.domElement.removeEventListener('mousemove', this.onMouseClick.bind(this), false)
 
     // @see https://discourse.threejs.org/t/how-to-completely-clean-up-a-three-js-scene-from-a-web-app-once-the-scene-is-no-longer-needed/1549/4
     this.renderer.dispose()
